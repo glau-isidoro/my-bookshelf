@@ -1,0 +1,21 @@
+Dark Places;;Gillian Flynn;;Libby Day was seven when her mother and two sisters were murdered
+Sharp Objects;;Gillian Flynn;;reporter Camille Preaker faces a troubling assignment: she must return to her tiny hometown to cover the murders of two preteen girls
+The Shining;;Stephen King;;Jack Torrance's new job at the Overlook Hotel
+Under the Dome;;Stephen King;;Chester’s Mill is inexplicably and suddenly sealed off from the rest of the world by an invisible force field
+It;;Stephen King;;the evil without a name
+The Killing Hour;;Lisa Gardner;;Each time he struck, he took two victims
+Purple Hibiscus;;Chimamanda Ngozi Adichie;;Fifteen-year-old Kambili and her older brother Jaja lead a privileged life in Enugu, Nigeria
+Half of a Yellow Sun;;Chimamanda Ngozi Adichie;;Biafra’s impassioned struggle to establish an independent republic in Nigeria in the 1960s
+Kotlin in Action;;Svetlana Isakova;;Kotlin in Action takes experienced Java developers from the language basics all the way through building applications to run on the JVM and Android devices
+Programming Kotlin;;Stefan Bocutiu;;This book provides a detailed introduction to Kotlin that shows you all its features
+The Martian;;Andy Weir;;Astronaut surviving on Mars
+Room;;Emma Donoghue;;To five-year-old-Jack, Room is the world
+Miss Peregrine's Home for Peculiar Children;;Ransom Riggs;;An abandoned orphanage
+11/22/63;;Stephen King;;Life can turn on a dime—or stumble into the extraordinary
+The Nightingale;;Kristin Hannah;;Vianne Mauriac must make one terrible choice after another
+The Egg;;Andy Weir;;A short story about the universe
+Perfume;;Patrick Suskind;;The Story of a Murderer
+The Pigeon;;Patrick Suskind;;story of a day in the meticulously ordered life of bank security guard Jonathan Noel
+Functional Kotlin;;Mario Arias;;This book bridges the language gap for Kotlin developers by showing you how to create and consume functional constructs in Kotlin
+The Joy of Kotlin;;Pierre-Yves Saumont;;Kotlin is fun!
+Effective Kotlin;;Marcin Moskala;;best practices and experiences of the Kotlin community
