@@ -5,15 +5,18 @@ import java.util.Scanner
 fun main(vararg args: String?) {
     println("Welcome to AWESOME BOOKSHELF!")
 
-    var listBooks = listOf<Book>()
     val file = File("books.txt")
     val input = Scanner(`in`)
 
-    file.forEachLine {
-        if (it.isNotEmpty()) {
-            val info = it.split(";;")
-            val book = Book(title = info[0], author = info[1], synopsis = info[2])
-            listBooks = listBooks.plus(book)
+    val listBooks = mutableListOf<Book>().apply {
+        file.forEachLine { line ->
+            if (line.isNotEmpty()) {
+                this.add(
+                    line.split(";;").let {
+                        Book(title = it[0], author = it[1], synopsis = it[2])
+                    }
+                )
+            }
         }
     }
 
@@ -42,7 +45,7 @@ fun runsBookshelf(args: String?, listBooks: List<Book>, input: Scanner, file: Fi
     val command = args ?: "nothing"
 
     when (command) {
-        Action.BOOKS.value -> showAllBook(listBooks)
+        Action.BOOKS.value -> showAllBooks(listBooks)
         Action.AUTHORS.value -> showAllAuthors(listBooks)
         Action.BOOKS_BY_AUTHOR.value -> findByAuthor(listBooks, input)
         Action.FIND_BOOK.value -> findBook(listBooks, input)
@@ -52,99 +55,115 @@ fun runsBookshelf(args: String?, listBooks: List<Book>, input: Scanner, file: Fi
     }
 }
 
-fun showOptions() {
+fun showOptions() = run {
     println("The options are:")
-    for (action in Action.values()) {
-        println("${action.value} -> ${action.description}")
-    }
+    Action.values().forEach { println("${it.value} -> ${it.description}") }
 }
 
-fun showAllBook(list: List<Book>) {
-    for (book in list) {
-        val message = "\nTitle: ${book.title} \nSynopsis: ${book.synopsis} \nAuthor: ${book.author}"
-        println(message)
+fun showAllBooks(list: List<Book>) {
+    list.forEach { book ->
+        book.run {
+            println("\nTitle: $title \nSynopsis: $synopsis \nAuthor: $author")
+        }
     }
 }
 
 fun showAllAuthors(list: List<Book>) {
-    val newList = list.distinctBy { it.author }
-    println("Our Authors:")
-    for (item in newList) {
-        println(item.author)
+    list.distinctBy { it.author }
+        .also { println("Our Authors:") }
+        .run {
+            this.forEach { println(it.author) }
+        }
+}
+
+fun addNewBook(file: File, input: Scanner) = input.run {
+    println("Let's add a new book!")
+    println("Write the Title of the book you want to add:")
+    nextLine().let { title ->
+        println("Who's the author?")
+        nextLine().let { author ->
+            println("Now tell us a little about this book:")
+            nextLine().let { synopsis ->
+                file.appendText("\n$title;;$author;;$synopsis")
+            }
+        }
     }
 }
 
-fun addNewBook(file: File, input: Scanner) {
-    println("Let's add a new book!")
-    println("Write the Title of the book you want to add:")
-    val title = input.nextLine()
-    println("Who's the author?")
-    val author = input.nextLine()
-    println("Now tell me a little about this book:")
-    val synopsis = input.nextLine()
-    file.appendText("\n$title;;$author;;$synopsis")
-}
-
 fun findByAuthor(list: List<Book>, input: Scanner) {
-    println("Give me the Author's name and we'll give you his books!")
-    val author = input.nextLine().toLowerCase()
-    val books = list.filter { it.author.toLowerCase().contains(author) }
-    if (books.isNotEmpty()) {
-        println("${books.first().author} wrote these books:")
-        for (book in books) {
-            println(book.title)
+    println("Give us the Author's name and we'll give you his/her books!")
+    input.nextLine().toLowerCase().let { author ->
+        list.filter { it.author.toLowerCase().contains(author) }.let { books ->
+            if (books.isNotEmpty()) {
+                println("$author wrote these books:")
+                books.forEach {
+                    println("${it.author} --> ${it.title}")
+                }
+            } else {
+                println("\nWe don't know this author. Write another name:")
+                findByAuthor(list, input)
+            }
         }
-    } else {
-        println("\nWe don't know this author. Write another name:")
-        findByAuthor(list, input)
     }
 }
 
 fun findBook(list: List<Book>, input: Scanner) {
-    println("Give a tip to find a book:")
-    val tip = input.nextLine().toLowerCase()
-    val listThatMatchTip = list.filter {
-        it.title.toLowerCase().contains(tip) ||
-                it.author.toLowerCase().contains(tip) ||
-                it.synopsis.toLowerCase().contains(tip)
-    }
-    if (listThatMatchTip.isEmpty()) {
-        println("We didn't find any book that matches \"$tip\". Try again.")
-        findBook(list, input)
-    } else {
-        println("\nWe found these books that match your search:")
-        showAllBook(listThatMatchTip)
-        println("\nDid you find what you were looking for? (yes/no)")
-        val answer = input.nextLine()
-        when (answer) {
-            "no" -> findBook(list, input)
-            "yes" -> println("Great!!!")
-            else -> {
-                println("We could't understand your answer. Let's start again!")
-                findBook(list, input)
+    with(list) {
+        println("Give us a tip to find a book:")
+        input.nextLine().toLowerCase().let {
+            this.filter { book ->
+                book.title.toLowerCase().contains(it) ||
+                        book.author.toLowerCase().contains(it) ||
+                        book.synopsis.toLowerCase().contains(it)
+            }.also { books ->
+                if (books.isEmpty()) {
+                    println("We didn't find any book that matches \"$it\". Try again.")
+                    findBook(this, input)
+                } else {
+                    println("\nWe found these books that matches your search:").also {
+                        showAllBooks(books)
+                    }
+                    println("\nDid you find what you were looking for? (yes/no)")
+                    input.nextLine().let { answer ->
+                        when (answer) {
+                            "no" -> findBook(this, input)
+                            "yes" -> println("Great!!!")
+                            else -> {
+                                println("We could't understand your answer. Let's start again!")
+                                findBook(this, input)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 fun removeBook(list: List<Book>, input: Scanner, file: File) {
-    println("What book do you want to remove?")
-    val word = input.nextLine().toLowerCase()
-    val listOfPotential = list.filter {
-        it.title.toLowerCase().contains(word) ||
-                it.author.toLowerCase().contains(word) ||
-                it.synopsis.toLowerCase().contains(word)
-    }
-    if (listOfPotential.isEmpty()) {
-        println("We didn't find anything that matches your search. Try again.")
-        removeBook(list, input, file)
-    } else {
-        println("We found these books that match your search:")
-        showAllBook(listOfPotential)
-        println("Tell me the title of the one you want to remove.")
-        val titleToDelete = input.nextLine().toLowerCase()
-        val booksToKeep = list.filter { it.title.toLowerCase() != titleToDelete }
-        file.writeText("")
-        booksToKeep.forEach { book -> file.appendText("${book.title};;${book.author};;${book.synopsis}\n") }
+    list.run {
+        println("What book do you want to remove?")
+        input.nextLine().toLowerCase().let {
+            filter { book ->
+                book.title.toLowerCase().contains(it) ||
+                        book.author.toLowerCase().contains(it) ||
+                        book.synopsis.toLowerCase().contains(it)
+            }
+        }
+    }.also {
+        if (it.isEmpty()) {
+            println("We didn't find anything that matches your search. Try again.")
+            removeBook(list, input, file)
+        } else {
+            println("We found these books that matches your search:")
+            showAllBooks(it)
+            println("Tell me the title of the one you want to remove.")
+            input.nextLine().toLowerCase().let { title ->
+                it.filter { book -> book.title.toLowerCase() != title }
+            }.apply {
+                file.writeText("")
+                this.forEach { book -> file.appendText("${book.title};;${book.author};;${book.synopsis}\n") }
+            }
+        }
     }
 }
